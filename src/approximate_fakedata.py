@@ -18,7 +18,7 @@ z = dist.Categorical(true_weights).sample([n_samples])
 data = torch.stack([dist.Gamma(true_alphas[i], true_betas[i]).sample() for i in z])
 
 # Step 2: Mixture model
-def model(data, K=2):
+def model(data, K=10):
     with pyro.plate("components", K):
         alpha = pyro.sample("alpha", dist.Exponential(1.0))
         beta = pyro.sample("beta", dist.Exponential(1.0))
@@ -31,7 +31,7 @@ def model(data, K=2):
         pyro.sample("obs", dist.Gamma(alpha[z], beta[z]), obs=data)
 
 # Step 3: Guide (no .to_event(1) here!)
-def guide(data, K=2):
+def guide(data, K=10):
     alpha_q = pyro.param("alpha_q", torch.ones(K), constraint=dist.constraints.positive)
     beta_q = pyro.param("beta_q", torch.ones(K), constraint=dist.constraints.positive)
     mix_logits_q = pyro.param("mix_logits_q", torch.zeros(K))
