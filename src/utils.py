@@ -23,32 +23,40 @@ def stats_dst_ip(df):
 
 def extract_dl_pkt_interval_time(df, dst_ip):
   # return array [[pkt_interval], [timestamp], [pkt_size]]
-  data = df['Time'][df['Destination'] == dst_ip]
-  timestamp = np.zeros([data.shape[0]])
+  data = df[df['Destination'] == dst_ip]
+
+  timestamp = np.zeros([data['Time'].shape[0]])
+  pkt_size = np.zeros([data['Length'].shape[0]])
   for i in range(data.shape[0]):
-    timestamp[i] = datetime.datetime.strptime(data.array[i],
+    timestamp[i] = datetime.datetime.strptime(data['Time'].array[i],
         "%Y-%m-%d %H:%M:%S.%f").timestamp()
+    pkt_size[i] = int(data['Length'].array[i])
+    # print(int(data['Length'].array[i]))
     # print(datetime.datetime.strptime(data.array[i],
     #     "%Y-%m-%d %H:%M:%S.%f").timestamp())
   res = np.zeros([timestamp.shape[0]-1, 3])
   res[:, 0] = timestamp[1:] - timestamp[:-1]
   res[:, 1] = timestamp[1:] - timestamp[1]
-  res[:, 2] = df['Length'][df['Destination'] == dst_ip][1:]
+  res[:, 2] = pkt_size[1:]
   return res
 
 def extract_ul_pkt_interval_time(df, src_ip):
   # return array [[pkt_interval], [timestamp], [pkt_size]]
-  data = df['Time'][df['Source'] == src_ip]
-  timestamp = np.zeros([data.shape[0]])
+  data = df[df['Source'] == src_ip]
+
+  timestamp = np.zeros([data['Time'].shape[0]])
+  pkt_size = np.zeros([data['Length'].shape[0]])
   for i in range(data.shape[0]):
-    timestamp[i] = datetime.datetime.strptime(data.array[i],
+    timestamp[i] = datetime.datetime.strptime(data['Time'].array[i],
         "%Y-%m-%d %H:%M:%S.%f").timestamp()
+    pkt_size[i] = int(data['Length'].array[i])
+    # print(int(data['Length'].array[i]))
     # print(datetime.datetime.strptime(data.array[i],
     #     "%Y-%m-%d %H:%M:%S.%f").timestamp())
   res = np.zeros([timestamp.shape[0]-1, 3])
   res[:, 0] = timestamp[1:] - timestamp[:-1]
   res[:, 1] = timestamp[1:] - timestamp[1]
-  res[:, 2] = df['Length'][df['Source'] == src_ip][1:]
+  res[:, 2] = pkt_size[1:]
   return res
   
 if __name__ == "__main__":
