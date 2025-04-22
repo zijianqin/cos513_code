@@ -21,6 +21,25 @@ def stats_dst_ip(df):
     new_df = df['Destination'][df['Destination'] == set_src[i]]
     print("{} appears {} times in dest ip.".format(set_src[i], new_df.shape[0]))
 
+def extract_pkt_interval_time(df):
+  # return array [[pkt_interval], [timestamp], [pkt_size]]
+  data = df
+
+  timestamp = np.zeros([data['Time'].shape[0]])
+  pkt_size = np.zeros([data['Length'].shape[0]])
+  for i in range(data.shape[0]):
+    timestamp[i] = datetime.datetime.strptime(data['Time'].array[i],
+        "%Y-%m-%d %H:%M:%S.%f").timestamp()
+    pkt_size[i] = int(data['Length'].array[i])
+    # print(int(data['Length'].array[i]))
+    # print(datetime.datetime.strptime(data.array[i],
+    #     "%Y-%m-%d %H:%M:%S.%f").timestamp())
+  res = np.zeros([timestamp.shape[0]-1, 3])
+  res[:, 0] = timestamp[1:] - timestamp[:-1]
+  res[:, 1] = timestamp[1:] - timestamp[1]
+  res[:, 2] = pkt_size[1:]
+  return res
+
 def extract_dl_pkt_interval_time(df, dst_ip):
   # return array [[pkt_interval], [timestamp], [pkt_size]]
   data = df[df['Destination'] == dst_ip]
